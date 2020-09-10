@@ -15,7 +15,7 @@
     "php": ">=7.2.0",
     "illuminate/support": "^8",
     "superbalist/php-pubsub": "^1.0|^2.0",
-    "superbalist/php-pubsub-google-cloud": "^5.3",
+    "superbalist/php-pubsub-google-cloud": "dev-master",
     "illuminate/console": "^8"
   },
   "autoload": {
