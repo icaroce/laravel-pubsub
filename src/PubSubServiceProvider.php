@@ -52,33 +52,12 @@ class PubSubServiceProvider extends ServiceProvider
      */
     protected function registerAdapterDependencies()
     {
-        $this->app->bind('pubsub.redis.redis_client', function ($app, $parameters) {
-            return new RedisClient($parameters['config']);
-        });
 
         $this->app->bind('pubsub.gcloud.pub_sub_client', function ($app, $parameters) {
             return new GoogleCloudPubSubClient($parameters['config']);
         });
 
-        $this->app->bind('pubsub.kafka.topic_conf', function () {
-            return new \RdKafka\TopicConf();
-        });
 
-        $this->app->bind('pubsub.kafka.producer', function ($app, $parameters) {
-            return new \RdKafka\Producer($parameters['conf']);
-        });
-
-        $this->app->bind('pubsub.kafka.conf', function () {
-            return new \RdKafka\Conf();
-        });
-
-        $this->app->bind('pubsub.kafka.consumer', function ($app, $parameters) {
-            return new \RdKafka\KafkaConsumer($parameters['conf']);
-        });
-
-        $this->app->bind('pubsub.http.client', function () {
-            return new Client();
-        });
     }
 
     /**
