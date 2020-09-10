@@ -8,10 +8,7 @@ use InvalidArgumentException;
 use Superbalist\PubSub\Adapters\DevNullPubSubAdapter;
 use Superbalist\PubSub\Adapters\LocalPubSubAdapter;
 use Superbalist\PubSub\GoogleCloud\GoogleCloudPubSubAdapter;
-use Superbalist\PubSub\HTTP\HTTPPubSubAdapter;
-use Superbalist\PubSub\Kafka\KafkaPubSubAdapter;
 use Superbalist\PubSub\PubSubAdapterInterface;
-use Superbalist\PubSub\Redis\RedisPubSubAdapter;
 
 class PubSubConnectionFactory
 {
@@ -43,83 +40,14 @@ class PubSubConnectionFactory
                 return new DevNullPubSubAdapter();
             case 'local':
                 return new LocalPubSubAdapter();
-            case 'redis':
-                return $this->makeRedisAdapter($config);
-            case 'kafka':
-                return $this->makeKafkaAdapter($config);
             case 'gcloud':
                 return $this->makeGoogleCloudAdapter($config);
-            case 'http':
-                return $this->makeHTTPAdapter($config);
         }
 
         throw new InvalidArgumentException(sprintf('The driver [%s] is not supported.', $driver));
     }
 
-    /**
-     * Factory a RedisPubSubAdapter.
-     *
-     * @param array $config
-     *
-     * @return RedisPubSubAdapter
-     */
-    protected function makeRedisAdapter(array $config)
-    {
-        if (!isset($config['read_write_timeout'])) {
-            $config['read_write_timeout'] = 0;
-        }
 
-        $client = $this->container->makeWith('pubsub.redis.redis_client', ['config' => $config]);
-
-        return new RedisPubSubAdapter($client);
-    }
-
-    /**
-     * Factory a KafkaPubSubAdapter.
-     *
-     * @param array $config
-     *
-     * @return KafkaPubSubAdapter
-     */
-    protected function makeKafkaAdapter(array $config)
-    {
-        // create default topic
-        $topicConf = $this->container->makeWith('pubsub.kafka.topic_conf');
-        $topicConf->set('auto.offset.reset', 'smallest');
-
-        // create config
-        $conf = $this->container->makeWith('pubsub.kafka.conf');
-        $conf->set('group.id', Arr::get($config, 'consumer_group_id', 'php-pubsub'));
-        $conf->set('metadata.broker.list', $config['brokers']);
-        $conf->set('enable.auto.commit', 'false');
-        $conf->set('offset.store.method', 'broker');
-
-        if (array_key_exists('security_protocol', $config)
-            && $config['security_protocol'] != ''
-        ) {
-            switch ($config['security_protocol']) {
-                case 'SASL_SSL':
-                case 'SASL_PLAINTEXT':
-                    $conf->set('security.protocol', Arr::get($config, 'security_protocol', 'SASL_SSL'));
-                    $conf->set('sasl.username', Arr::get($config, 'sasl_username', 'sasl_username'));
-                    $conf->set('sasl.password', Arr::get($config, 'sasl_password', 'sasl_password'));
-                    $conf->set('sasl.mechanisms', Arr::get($config, 'sasl_mechanisms', 'PLAIN'));
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        // create producer
-        $producer = $this->container->makeWith('pubsub.kafka.producer', ['conf' => $conf]);
-        $producer->addBrokers($config['brokers']);
-
-        // create consumer
-        $consumer = $this->container->makeWith('pubsub.kafka.consumer', ['conf' => $conf]);
-
-        return new KafkaPubSubAdapter($producer, $consumer);
-    }
 
     /**
      * Factory a GoogleCloudPubSubAdapter.
