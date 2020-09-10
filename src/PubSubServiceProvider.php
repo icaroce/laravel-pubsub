@@ -5,7 +5,6 @@ namespace Superbalist\LaravelPubSub;
 use Google\Cloud\PubSub\PubSubClient as GoogleCloudPubSubClient;
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
-use Predis\Client as RedisClient;
 use Superbalist\PubSub\PubSubAdapterInterface;
 
 class PubSubServiceProvider extends ServiceProvider
@@ -71,12 +70,7 @@ class PubSubServiceProvider extends ServiceProvider
             'pubsub',
             'pubsub.factory',
             'pubsub.connection',
-            'pubsub.redis.redis_client',
             'pubsub.gcloud.pub_sub_client',
-            'pubsub.kafka.topic_conf',
-            'pubsub.kafka.producer',
-            'pubsub.kafka.consumer',
-            'pubsub.http.client',
         ];
     }
 }
