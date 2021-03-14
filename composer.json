@@ -13,10 +13,10 @@
   },
   "require": {
     "php": ">=7.2.0",
-    "illuminate/support": "^6",
+    "illuminate/support": "^6|^8",
     "superbalist/php-pubsub": "^1.0|^2.0",
     "superbalist/php-pubsub-google-cloud": "dev-master",
-    "illuminate/console": "^6"
+    "illuminate/console": "^6|^8"
   },
   "autoload": {
     "psr-4": {
